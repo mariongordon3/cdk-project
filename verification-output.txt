@@ -1,0 +1,93 @@
+## 1. Stack status
+----------------------------------------------------
+|                  DescribeStacks                  |
++------------------------------+-------------------+
+|  ServerStack                 |  UPDATE_COMPLETE  |
+|  NetworkStack                |  CREATE_COMPLETE  |
+|  aws-sam-cli-managed-default |  CREATE_COMPLETE  |
+|  lab-network                 |  CREATE_COMPLETE  |
++------------------------------+-------------------+
+## 2. Subnets
+---------------------------------------------------------------------------
+|                             DescribeSubnets                             |
++----------------------------------+-------------+--------------+---------+
+|  NetworkStack/Vpc/PrivateSubnet1 |  us-east-1a |  10.0.2.0/24 |  False  |
+|  NetworkStack/Vpc/PublicSubnet1  |  us-east-1a |  10.0.0.0/24 |  True   |
+|  NetworkStack/Vpc/PrivateSubnet2 |  us-east-1b |  10.0.3.0/24 |  False  |
+|  NetworkStack/Vpc/PublicSubnet2  |  us-east-1b |  10.0.1.0/24 |  True   |
++----------------------------------+-------------+--------------+---------+
+## 3. Target health
+------------------------------------
+|       DescribeTargetHealth       |
++----------------------+-----------+
+|  i-0e881bee7860c0fde |  healthy  |
+|  i-0790b947867f3fd78 |  healthy  |
++----------------------+-----------+
+## 4. Requests through ALB x8
+<p>Served by instance i-0790b947867f3fd78 in us-east-1b</p>
+<p>Served by instance i-0790b947867f3fd78 in us-east-1b</p>
+<p>Served by instance i-0e881bee7860c0fde in us-east-1a</p>
+<p>Served by instance i-0790b947867f3fd78 in us-east-1b</p>
+<p>Served by instance i-0e881bee7860c0fde in us-east-1a</p>
+<p>Served by instance i-0790b947867f3fd78 in us-east-1b</p>
+<p>Served by instance i-0790b947867f3fd78 in us-east-1b</p>
+## 5. Direct to each web server
+-- 32.201.38.77
+-- 32.202.127.237
+## 6. Security group rules
+[
+    [
+        "ServerStack-DbSg495F8305-gXSwMLq2D3K9",
+        "sg-03dc38e4def9b43a2",
+        [
+            [
+                3306,
+                [],
+                [
+                    "sg-000365f6f73afe1ff"
+                ]
+            ]
+        ]
+    ],
+    [
+        "ServerStack-WebServerSg02D2F8DD-7K7PCjEH0CJj",
+        "sg-000365f6f73afe1ff",
+        [
+            [
+                80,
+                [
+                    "0.0.0.0/0"
+                ],
+                []
+            ]
+        ]
+    ]
+]
+## 7. RDS
+[
+    {
+        "Engine": "mysql",
+        "Version": "8.0.46-rds.20260908",
+        "PubliclyAccessible": false,
+        "SubnetGroup": [
+            [
+                "subnet-0490ffe3d9b80376e",
+                "us-east-1b"
+            ],
+            [
+                "subnet-002030d3784cb63c7",
+                "us-east-1a"
+            ]
+        ]
+    }
+]
+## 8. RDS port 3306 from this laptop (internet)
+nc: connectx to serverstack-databaseb269d8bb-k1l12l2iiwm7.c8lym6mqy4is.us-east-1.rds.amazonaws.com port 3306 (tcp) failed: Operation timed out
+
+## 5b. Direct to each web server (retry)
+-- 32.201.38.77
+<h1>Congratulations, you have successfully launched the AWS CDK sample.</h1>
+<p>Served by instance i-0e881bee7860c0fde in us-east-1a</p>
+-- 32.202.127.237
+<h1>Congratulations, you have successfully launched the AWS CDK sample.</h1>
+<p>Served by instance i-0790b947867f3fd78 in us-east-1b</p>
